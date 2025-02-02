@@ -7,5 +7,5 @@ This project is the backend service for Student Exit System. It provides APIs fo
 ## Setup Instructions
 1. Clone the repository:
     ```
-    git clone <repository-url>
+    git clone https://github.com/LoOs5092/maumn-project
     ```
