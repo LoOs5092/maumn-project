@@ -1,0 +1,31 @@
+{
+  "name": "maumn-backend",
+  "version": "0.1.0",
+  "description": "The backend of maumn which includes the models for the database and an orm and some crud operations with the usage of graphql",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoOs5092/maumn-backend.git"
+  },
+  "author": "qassim uni - computer science students",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LoOs5092/maumn-backend/issues"
+  },
+  "homepage": "https://github.com/LoOs5092/maumn-backend#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.2",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
