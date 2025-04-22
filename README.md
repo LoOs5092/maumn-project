@@ -58,6 +58,14 @@ npm start
 - **GET /users/:id**
 - **PUT /users/:id**
 - **DELETE /users/:id**
+### Get User By Phone Number
+- **GET /users/phone/:phone**  
+  Retrieves a user by their phone number. The endpoint normalizes various phone number formats.  
+  - If the phone number does not start with a `+`, it is assumed to be a local Saudi Arabia number and prefixed with `+966`.  
+  - Example requests:
+    - `/users/phone/0555123456` will be normalized to `/users/phone/+966555123456`
+    - `/users/phone/+966555123456` remains unchanged  
+  - If the phone number is invalid or the user is not found, appropriate error responses will be returned.
 
 ### Schools
 - **POST /schools**

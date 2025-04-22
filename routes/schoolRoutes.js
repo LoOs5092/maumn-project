@@ -6,6 +6,7 @@ const schoolController = require('../controllers/schoolController');
 router.post('/', schoolController.createSchool);
 router.get('/', schoolController.getAllSchools);
 router.get('/:id', schoolController.getSchoolById);
+router.get('/:id/parents-and-children', schoolController.getSchoolParentsAndChildren);
 router.put('/:id', schoolController.updateSchool);
 router.delete('/:id', schoolController.deleteSchool);
 

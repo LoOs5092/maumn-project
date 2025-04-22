@@ -37,9 +37,14 @@ const User = sequelize.define('User', {
     type: DataTypes.ENUM('Admin', 'Staff', 'User'),
     allowNull: false,
   },
-  school_id: {
+  school_id: { // only for staff not parents or guardians.
     type: DataTypes.INTEGER,
     allowNull: true,
+  },
+  firebase_uid: {
+    type: DataTypes.STRING(128),
+    allowNull: true,
+    unique: true
   }
 }, {
   tableName: 'users',

@@ -8,6 +8,9 @@ router.post('/', userController.createUser);
 // Retrieve all users
 router.get('/', userController.getAllUsers);
 
+// Retrieve a user by phone number
+router.get('/phone/:phone', userController.getUserByPhoneNumber);
+
 // Retrieve a single user by ID
 router.get('/:id', userController.getUserById);
 

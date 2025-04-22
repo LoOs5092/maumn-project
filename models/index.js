@@ -25,16 +25,14 @@ Student.hasMany(AuthorizedPickupPerson, { foreignKey: 'student_id' });
 Student.hasMany(DismissalRecord, { foreignKey: 'student_id' });
 
 // User associations
-// User.hasMany(AuthorizedPickupPerson, { foreignKey: 'user_id' });
-// User.hasMany(DismissalRecord, { foreignKey: 'pickup_person_user_id' });
+User.hasMany(AuthorizedPickupPerson, { foreignKey: 'user_id' });
+AuthorizedPickupPerson.belongsTo(User, { foreignKey: 'user_id' });
 
 // AuthorizedPickupPerson associations
 AuthorizedPickupPerson.belongsTo(Student, { foreignKey: 'student_id' });
-// AuthorizedPickupPerson.belongsTo(User, { foreignKey: 'user_id' });
 
 // DismissalRecord associations
 DismissalRecord.belongsTo(Student, { foreignKey: 'student_id' });
-// DismissalRecord.belongsTo(User, { foreignKey: 'pickup_person_user_id' });
 
 // Announcement associations
 Announcement.belongsTo(School, { foreignKey: 'school_id' });
