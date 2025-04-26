@@ -144,3 +144,47 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.getParentKidsInfo = async (req, res) => {
+  try {
+    // Retrieve the Firebase UID from the authenticated request
+    const firebaseUid = req.user.uid;
+    
+    // Find the parent using the Firebase UID
+    const parent = await User.findOne({
+      where: { firebase_uid: firebaseUid },
+      attributes: ['user_id', 'first_name', 'last_name', 'phone_number', 'email']
+    });
+    
+    if (!parent) {
+      return res.status(404).json({ message: 'Parent not found' });
+    }
+
+    // Fetch parent's children info through the AuthorizedPickupPerson model,
+    // which acts as the bridge between the parent and the Student record.
+    const parentWithKids = await User.findOne({
+      where: { firebase_uid: firebaseUid },
+      attributes: ['user_id', 'first_name', 'last_name', 'phone_number', 'email'],
+      include: [{
+        model: AuthorizedPickupPerson,
+        required: false, // in case there is no associated kid
+        where: {
+          relationship_type: 'Parent',
+          authorization_status: 'Approved'
+        },
+        include: [{
+          model: Student,
+          include: [{
+            model: GradeLevel,
+            attributes: ['grade_number', 'grade_label', 'description']
+          }]
+        }]
+      }]
+    });
+
+    res.status(200).json(parentWithKids);
+  } catch (error) {
+    console.error('Error fetching parent and kids info:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
