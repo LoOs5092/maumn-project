@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, AuthorizedPickupPerson, Student, GradeLevel } = require('../models');
 const admin = require('../config/firebase');
 
 // Function to normalize phone numbers with default Saudi Arabia country code (+966)
@@ -15,6 +15,7 @@ const normalizePhoneNumber = (phone) => {
 
 // Create a new user
 exports.createUser = async (req, res) => {
+  let firebaseUser;
   try {
     const { first_name, last_name, phone_number, email, password_hash, user_role, school_id } = req.body;
 
@@ -26,13 +27,31 @@ exports.createUser = async (req, res) => {
     // Normalize phone number if provided
     const normalizedPhone = phone_number ? normalizePhoneNumber(phone_number) : null;
 
-    // Create user in Firebase
-    const firebaseUser = await admin.auth().createUser({
-      phoneNumber: normalizedPhone,
-      email: email || undefined,
-      password: password_hash,
-      displayName: `${first_name} ${last_name}`,
-    });
+    // Check if user exists in Firebase by phone number or email
+    if (normalizedPhone) {
+      try {
+        firebaseUser = await admin.auth().getUserByPhoneNumber(normalizedPhone);
+      } catch (error) {
+        // Not found: continue to check by email or create new user
+      }
+    }
+    if (!firebaseUser && email) {
+      try {
+        firebaseUser = await admin.auth().getUserByEmail(email);
+      } catch (error) {
+        // Not found: will create new user
+      }
+    }
+
+    // If user does not exist, create in Firebase
+    if (!firebaseUser) {
+      firebaseUser = await admin.auth().createUser({
+        phoneNumber: normalizedPhone,
+        email: email || undefined,
+        password: password_hash,
+        displayName: `${first_name} ${last_name}`,
+      });
+    }
 
     // Create user in database with Firebase UID
     const user = await User.create({
@@ -52,8 +71,8 @@ exports.createUser = async (req, res) => {
     // Check if Firebase user was created but database creation failed
     if (error.code !== 'auth/invalid-phone-number' && error.code !== 'auth/invalid-email') {
       try {
-        // If Firebase user exists, delete it to maintain consistency
-        if (firebaseUser?.uid) {
+        // If Firebase user exists, delete it to maintain consistency (only if it was newly created)
+        if (!req.body.existingFirebaseUser && firebaseUser?.uid) {
           await admin.auth().deleteUser(firebaseUser.uid);
         }
       } catch (deleteError) {
@@ -161,7 +180,8 @@ exports.getParentKidsInfo = async (req, res) => {
     }
 
     // Fetch parent's children info through the AuthorizedPickupPerson model,
-    // which acts as the bridge between the parent and the Student record.
+    // acting as the bridge between the parent and the Student record.
+    // Now also includes the school details associated with each student.
     const parentWithKids = await User.findOne({
       where: { firebase_uid: firebaseUid },
       attributes: ['user_id', 'first_name', 'last_name', 'phone_number', 'email'],
@@ -174,14 +194,20 @@ exports.getParentKidsInfo = async (req, res) => {
         },
         include: [{
           model: Student,
-          include: [{
-            model: GradeLevel,
-            attributes: ['grade_number', 'grade_label', 'description']
-          }]
+          include: [
+            {
+              model: GradeLevel,
+              attributes: ['grade_number', 'grade_label', 'description']
+            },
+            {
+              // Ensure the association Student.belongsTo(School) is defined
+              model: require('../models/School'),
+              attributes: ['school_id', 'school_name', 'address', 'phone_number']
+            }
+          ]
         }]
       }]
     });
-
     res.status(200).json(parentWithKids);
   } catch (error) {
     console.error('Error fetching parent and kids info:', error);

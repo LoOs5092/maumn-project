@@ -9,6 +9,8 @@ router.post('/', userController.createUser);
 // Retrieve all users
 router.get('/', userController.getAllUsers);
 
+// GET /users/profile returns the parent's info and their kids info if authenticated
+router.get('/profile', firebaseAuthMiddleware, userController.getParentKidsInfo);
 // Retrieve a user by phone number
 router.get('/phone/:phone', userController.getUserByPhoneNumber);
 
@@ -21,7 +23,6 @@ router.put('/:id', userController.updateUser);
 // Delete a user by ID
 router.delete('/:id', userController.deleteUser);
 
-// GET /users/profile returns the parent's info and their kids info if authenticated
-router.get('/profile', firebaseAuthMiddleware, userController.getParentKidsInfo);
+
 
 module.exports = router;
