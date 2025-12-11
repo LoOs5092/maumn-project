@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Make sure node_modules binaries are executable
+RUN chmod -R +x node_modules/.bin
+
 # Expose the port the app runs on
 EXPOSE 3000
 

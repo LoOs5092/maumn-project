@@ -3,6 +3,7 @@
 services:
   app:
     build: .
+    command: sh -c "until npx sequelize-cli db:migrate; do echo 'Migration failed, retrying in 5s...'; sleep 5; done && npm run dev"
     ports:
       - "3000:3000"
     environment:

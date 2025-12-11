@@ -2,8 +2,48 @@
 
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        // Retrieve the table definition
-        const tableInfo = await queryInterface.describeTable('grade_levels');
+        let tableInfo;
+        try {
+            // Retrieve the table definition
+            tableInfo = await queryInterface.describeTable('grade_levels');
+        } catch (error) {
+            // If table doesn't exist, create it with the final structure
+            return queryInterface.createTable('grade_levels', {
+                grade_level_id: {
+                    type: Sequelize.INTEGER,
+                    autoIncrement: true,
+                    primaryKey: true,
+                },
+                grade_number: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                },
+                grade_label: {
+                    type: Sequelize.STRING(10),
+                    allowNull: true,
+                },
+                parent_grade_id: {
+                    type: Sequelize.INTEGER,
+                    allowNull: true,
+                    references: {
+                        model: 'grade_levels',
+                        key: 'grade_level_id'
+                    }
+                },
+                description: {
+                    type: Sequelize.STRING(255),
+                    allowNull: true,
+                },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                }
+            });
+        }
 
         // 1. Add grade_number column (integer, not null) if it doesn't exist
         if (!tableInfo.grade_number) {
@@ -22,15 +62,17 @@ module.exports = {
         }
 
         // 3. Split existing grade_name values into grade_number and grade_label.
-        // Assumes grade_name always starts with a single digit.
-        await queryInterface.sequelize.query(`
-            UPDATE grade_levels
-            SET grade_number = CAST(SUBSTRING(grade_name FROM 1 FOR 1) AS INTEGER),
-                grade_label = CASE 
-                               WHEN CHAR_LENGTH(grade_name) > 1 THEN SUBSTRING(grade_name FROM 2)
-                               ELSE NULL
-                              END
-        `);
+        // Only run if grade_name exists
+        if (tableInfo.grade_name) {
+            await queryInterface.sequelize.query(`
+                UPDATE grade_levels
+                SET grade_number = CAST(SUBSTRING(grade_name FROM 1 FOR 1) AS INTEGER),
+                    grade_label = CASE 
+                                   WHEN CHAR_LENGTH(grade_name) > 1 THEN SUBSTRING(grade_name FROM 2)
+                                   ELSE NULL
+                                  END
+            `);
+        }
 
         // 4. Remove the old grade_name column if it exists
         if (tableInfo.grade_name) {
