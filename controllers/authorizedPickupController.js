@@ -22,7 +22,16 @@ exports.createAuthorizedPickup = async (req, res) => {
 
 exports.getAllAuthorizedPickups = async (req, res) => {
   try {
-    const pickups = await AuthorizedPickupPerson.findAll();
+    const { student_id } = req.query;
+    const whereClause = {};
+    
+    if (student_id) {
+      whereClause.student_id = student_id;
+    }
+
+    const pickups = await AuthorizedPickupPerson.findAll({
+      where: whereClause
+    });
     res.status(200).json(pickups);
   } catch (error) {
     console.error('Error fetching authorized pickups:', error);
