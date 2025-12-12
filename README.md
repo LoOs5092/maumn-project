@@ -1,7 +1,11 @@
-# Graduation Project (Student Exit System) - Backend
+# Maumn (مأمن) - Student Exit System Backend
 
 ## Overview
-This project is the backend service for the Student Exit System. It provides a comprehensive set of APIs for managing and processing data related to student exits. Built using Node.js, Express.js, and Sequelize ORM, it interacts with a PostgreSQL database to ensure data integrity and ease of management.
+**Maumn (مأمن)** is a smart Student Exit System designed to streamline and secure the process of dismissing students from schools. This project serves as the backend infrastructure for the Maumn platform, ensuring real-time synchronization, secure data management, and seamless communication between schools and parents.
+
+This project was developed as a participation in the **Absher Tuwaiq Hackathon (هاكاثون أبشر طويق)**.
+
+Built using **Node.js**, **Express.js**, and **Sequelize ORM**, it interacts with a **PostgreSQL** database to ensure data integrity and ease of management. It also leverages **Firebase** for authentication and **Socket.IO** for real-time updates.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -122,10 +126,3 @@ docker-compose up --build
 ```
 The application will be accessible at `http://localhost:3000`.
 
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the ISC License. See the LICENSE file for details.
